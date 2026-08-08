@@ -3,3 +3,7 @@ __pycache__/
 .DS_Store
 .pytest_cache/
 .venv/
+
+# Session state written by claude-handoff-guard's Stop hook
+HANDOFF.md
+HANDOFF.md.bak

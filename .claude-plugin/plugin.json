@@ -1,0 +1,9 @@
+{
+  "name": "skill-or-not",
+  "description": "Decides whether a problem, workflow, or intent should become a skill, a script, a CLI, a hook, a subagent, an MCP server, a scheduled job, a plugin, or nothing at all — and audits existing skills for whether their shape is still right.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Ashwin Sinha"
+  },
+  "license": "MIT"
+}
