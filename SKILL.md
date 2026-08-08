@@ -5,8 +5,10 @@ description: >
   script, a CLI, a hook, a subagent, an MCP server, a scheduled job, a plugin,
   or nothing at all — and audits existing skills for whether their shape is
   still right. Use when the user asks "should this be a skill?", "how should I
-  build this?", "is this worth automating?", "audit my skills", "which of my
-  skills shouldn't be skills?", or invokes /skill-or-not.
+  build this?", "skill or script?", "what's the right mechanism for this?",
+  "what shape should this take?", "is this worth automating?", "am I
+  over-engineering this?", "audit my skills", "which of my skills shouldn't be
+  skills?", or invokes /skill-or-not.
 ---
 
 # Skill or Not
@@ -96,7 +98,9 @@ A push or PR → **CI**. A person, in conversation → **user-invocable skill** 
 **G5 — Reach.** Authenticated external system, reusable across tasks → **MCP
 server**. Single-purpose external call → **script holding the credential**.
 Reach is not knowledge: MCP grants access but teaches nothing, so anything
-needing both takes MCP **and** a skill.
+needing both takes MCP **plus a knowledge carrier** — and G3 decides whether
+that carrier is CLAUDE.md or a skill. Do not assume a skill; two standing facts
+belong in CLAUDE.md.
 
 **G6 — Context.** Needs isolation, parallel fan-out, or produces output that
 would flood the main thread → **subagent**, or a skill with `context: fork`.

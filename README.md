@@ -13,14 +13,15 @@ The default answer is **no**. The gate order puts the burden of proof on buildin
 a skill, because the usual failure isn't picking the wrong mechanism — it's
 building something where nothing was needed.
 
-> **Status: v0.2, partially verified.** Across two blind batches, 12 trials
-> survived as valid: the skill fired 11/12, got the right primary shape 8/8,
-> recommended a forbidden shape 0 times, and named the right reason 8/8. Every
-> bar clears, on a smaller sample than intended — 4 trials were voided by a
-> shared session and 2 more by prior art already installed on the test machine.
-> Those 4 are pending a re-run. No gate defect has surfaced since v0.2; every
-> miss in the second batch was a flaw in an eval label rather than the rubric.
-> Treat the verdicts as arguments, not measurements.
+> **Status: v0.3 — gates measured at v0.2, wording since changed.** The v0.2
+> rubric cleared every bar across 8 blind trials run in isolated sessions: the
+> skill fired 7/8, gave the right primary shape 6/6, recommended a forbidden
+> shape 0 times, and named the right reason 6/6. Shape and reason are perfect
+> on 6 trials rather than the 8 the bar was written for. v0.3 changes wording
+> only — a widened description and a G5 clarification, no gate logic — and a
+> 3-case confirmation is pending. Gate logic has been stable across 14 trials;
+> every finding since v0.2 has been text or an eval label. Treat the verdicts
+> as arguments, not measurements.
 
 ---
 

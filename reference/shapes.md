@@ -137,7 +137,11 @@ that access is reusable across many different tasks.
 is simpler.
 
 Reach is not knowledge. MCP grants access; it cannot teach conventions. When a
-task needs both, the answer is MCP **plus** a skill, and neither alone is enough.
+task needs both, the answer is MCP **plus a knowledge carrier** — and G3, not
+this gate, decides what that carrier is. Two standing facts are CLAUDE.md; a
+procedure with steps is a skill. Reaching for a skill by reflex is the common
+error, because "MCP can't teach it" says nothing about whether the teaching has
+steps.
 
 ---
 
