@@ -30,7 +30,7 @@ building something where nothing was needed.
 ## Try it in 30 seconds
 
 ```bash
-git clone https://github.com/<you>/skill-or-not.git
+git clone https://github.com/4shw1nS/skill-or-not.git
 cp -R skill-or-not ~/.claude/skills/
 ```
 
