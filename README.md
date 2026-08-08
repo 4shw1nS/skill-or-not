@@ -13,13 +13,14 @@ The default answer is **no**. The gate order puts the burden of proof on buildin
 a skill, because the usual failure isn't picking the wrong mechanism — it's
 building something where nothing was needed.
 
-> **Status: v0.2, partially verified.** One blind batch has been run: 8 cases in
-> fresh sessions, 6 valid (two were settled by already-installed prior art). Of
-> those 6 the skill fired 7/8 times, got the right shape 6/6, recommended a
-> forbidden shape 0 times, and named the right reason 5/6. That batch produced
-> four fixes, two of which — the **Actor** axis and the **duplicate-trigger**
-> signal — changed the rubric itself, so v0.2 has **not** been re-measured. A
-> fresh batch is pending. Treat the verdicts as arguments, not measurements.
+> **Status: v0.2, partially verified.** Across two blind batches, 12 trials
+> survived as valid: the skill fired 11/12, got the right primary shape 8/8,
+> recommended a forbidden shape 0 times, and named the right reason 8/8. Every
+> bar clears, on a smaller sample than intended — 4 trials were voided by a
+> shared session and 2 more by prior art already installed on the test machine.
+> Those 4 are pending a re-run. No gate defect has surfaced since v0.2; every
+> miss in the second batch was a flaw in an eval label rather than the rubric.
+> Treat the verdicts as arguments, not measurements.
 
 ---
 

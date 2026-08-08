@@ -56,6 +56,23 @@ engages at all before grading what it said. Real requests rarely arrive
 pre-labeled as design questions, so silent non-firing is the failure mode most
 worth watching.
 
+### Why the actor is pinned in most inputs
+
+The skill asks up to three clarifying questions, which means an input leaving an
+axis unstated is **not a reproducible trial** — different answers produce
+different correct verdicts, and the label only describes one branch. Four cases
+in one batch drifted off their labels this way, all of them on the actor axis.
+
+So inputs state who performs the work unless the ambiguity *is* the test.
+`support-triage` and `csv-chart` stay deliberately underspecified, because
+asking rather than guessing is what they measure.
+
+Pinning also changes what a case tests. `bigquery-conventions` pinned to one
+person exercises G5 (reach); the same case with analysts querying the tables
+makes G0 fire first and lands on database views instead. Both verdicts are
+right — they answer different questions. If you loosen a pin, expect the gate
+under test to change with it.
+
 A case **passes** when the primary shape matches, nothing from `expected_not`
 appears, and the stated reason matches `decisive_signal`. Getting the right
 answer for the wrong reason is a fail — it means the rubric didn't do the work
