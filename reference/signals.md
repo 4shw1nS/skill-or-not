@@ -36,6 +36,8 @@ Any one of these settles it. Do not accumulate counter-arguments.
 
 | Signal | Verdict |
 |---|---|
+| **The actor is human, not Claude** | CI, linter, process, docs |
+| **An installed skill already claims these triggers** | extend it, don't add a second |
 | **Runs unattended** — no human or model present at runtime | script + hook/cron/CI |
 | **Identical invocation every time** | alias |
 | **Needs reproducibility, speed, or bulk** | script |
@@ -43,6 +45,21 @@ Any one of these settles it. Do not accumulate counter-arguments.
 | **Enforcement must be unbypassable** | hook + permissions |
 | **Prior art exists** | build nothing |
 | **The rules are already encoded in a linter/formatter/validator** | run that tool |
+
+**On the actor signal.** Skills, hooks, CLAUDE.md, and permission rules all
+constrain Claude alone. A teammate who hand-writes the violation, uses a
+different editor, or pastes from the web never encounters them. When the
+behavior you want to change belongs to people, the only mechanism that reaches
+both them and the model is one that sits in shared infrastructure — CI, a
+pre-commit hook in the repo, a linter everyone runs. Wanting a Claude-side fix
+for a human problem is one of the easiest mistakes to make here, because the
+request arrives while you are already talking to Claude.
+
+**On the duplicate-trigger signal.** Two model-invocable skills matching the
+same phrases both pay permanent system-prompt rent, and which one fires is not
+something you control. Before adding a skill, check what its trigger phrases
+would collide with. Extending the incumbent is almost always cheaper than
+competing with it.
 
 ## Decisive for a skill
 

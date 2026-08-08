@@ -11,7 +11,7 @@ description: >
 
 # Skill or Not
 
-Place the candidate on five axes, run the gates in order, name the composition.
+Place the candidate on six axes, run the gates in order, name the composition.
 Most correct answers are a combination of mechanisms, not a single one.
 
 ## Modes
@@ -35,13 +35,14 @@ If prior art covers the whole request, emit that verdict and stop — the gates
 below are only for what it leaves unsolved. Skipping this step is the single
 most expensive error available here.
 
-### Step 1: The five axes
+### Step 1: The six axes
 
 Fill this table explicitly before forming any opinion. Reasoning that starts
 with a verdict and backfills justification is the main failure mode.
 
 | Axis | Question | Answer |
 |---|---|---|
+| **Actor** | Whose behavior must change — Claude's, a human's, or both? | |
 | **Judgment** | Is there a decision between the request and the command? | |
 | **Trigger** | What starts it — a person, Claude, an event, a clock, a push? | |
 | **Context** | Main thread, isolated subagent, or outside Claude entirely? | |
@@ -56,46 +57,55 @@ then proceed on stated assumptions.
 Run **all** of them, in order. A gate answering "no" never ends the run — later
 gates catch cases earlier ones route past.
 
-**G0 — Enforcement.** Must this be impossible to bypass — safety, secrets,
+**G0 — Actor.** Whose behavior must change? Every Claude-side mechanism — skill,
+hook, CLAUDE.md, permission rule — governs **Claude and nobody else**. If the
+behavior belongs to humans (or to other tools they use), none of them reach it:
+route to **CI, a linter, a process change, or documentation**. If it belongs to
+both, pick the mechanism that catches both, which is almost always CI.
+
+> Ask this literally: who performs the action you want changed? "Engineers keep
+> committing X" is not a Claude problem, however much it feels like one.
+
+**G1 — Enforcement.** Must this be impossible to bypass — safety, secrets,
 destructive commands? → **hook + permission rules**, and stop. Instructions are
-advisory and a model can be argued out of them, so this overrides G1 even when
+advisory and a model can be argued out of them, so this overrides G2 even when
 judgment is genuinely involved. A skill may add guidance on top, never instead.
 
-**G1 — Judgment.** Is there a decision a model must make between the request and
+**G2 — Judgment.** Is there a decision a model must make between the request and
 the command?
 - **No** → deterministic code owns the work. Keep going; the remaining gates
   still apply, and one of them may still put a model beside it.
 - **Yes** → a model belongs somewhere in the loop.
 
-**G2 — Fact or procedure.** Only if G1 was yes. True on every turn, with no
+**G3 — Fact or procedure.** Only if G2 was yes. True on every turn, with no
 steps → **CLAUDE.md**, and it costs context on every turn, so be sure. Invoked
 sometimes, and has steps → **skill**. A CLAUDE.md section that has grown steps
 has become a skill; move it.
 
-**G3 — Trigger.** A tool or file event → **hook**. A clock → **scheduled task**.
+**G4 — Trigger.** A tool or file event → **hook**. A clock → **scheduled task**.
 A push or PR → **CI**. A person, in conversation → **user-invocable skill** or
 **CLI**. Claude noticing relevance → **model-invocable skill**.
 
-> If G1 said "judgment required" and G3 says "unattended", that is a conflict.
+> If G2 said "judgment required" and G4 says "unattended", that is a conflict.
 > Resolve it by blast radius, not by reflex. Where a silent failure does real
 > damage — deploys, money, data loss — split it: the deterministic core runs
 > unattended and the judgment stays interactive. Where a degraded result is
 > merely unhelpful, a scheduled model run is legitimate; say so, and mark the
 > verdict Medium rather than High.
 
-**G4 — Reach.** Authenticated external system, reusable across tasks → **MCP
+**G5 — Reach.** Authenticated external system, reusable across tasks → **MCP
 server**. Single-purpose external call → **script holding the credential**.
 Reach is not knowledge: MCP grants access but teaches nothing, so anything
 needing both takes MCP **and** a skill.
 
-**G5 — Context.** Needs isolation, parallel fan-out, or produces output that
+**G6 — Context.** Needs isolation, parallel fan-out, or produces output that
 would flood the main thread → **subagent**, or a skill with `context: fork`.
 
-**G6 — Distribution.** One user → `~/.claude/`. A team or several repos →
+**G7 — Distribution.** One user → `~/.claude/`. A team or several repos →
 **plugin**. Public → plugin plus a marketplace. Packaging is an independent
 axis; it never replaces the mechanism chosen above.
 
-**G7 — Invocation.** Only if a skill survived. Side effects or timing the user
+**G8 — Invocation.** Only if a skill survived. Side effects or timing the user
 must control → `disable-model-invocation: true`. Background knowledge that isn't
 an action → `user-invocable: false`. Otherwise leave both default.
 
@@ -105,10 +115,19 @@ an action → `user-invocable: false`. Otherwise leave both default.
 Build:        <primary shape>
 Plus:         <composition, or "nothing else">
 Don't build:  <the tempting wrong answer, and why it's wrong>
-Because:      <one named decisive signal>
-Confidence:   High | Medium | Close call
+Because:      <the signal that actually ended the run>
+Confidence:   High | Medium | Close call — split it per part when they differ
 Flips if:     <the falsifier>
 ```
+
+**`Because:` must name the gate or step that actually terminated the run**, not
+the most familiar one. If Step 0 ended it, the reason is prior art. If G0 ended
+it, the reason is that the actor is not Claude. If G4 ended it, the reason is
+the trigger. Defaulting to "no judgment" whenever G2 happened to be *involved*
+is the common error — G2 is the reason only when G2 is what settled it.
+
+Split `Confidence:` when the parts differ: a composition can be High on the
+script and Medium on whether the skill half is worth writing at all.
 
 Then offer to scaffold. Do not scaffold unasked.
 
@@ -116,7 +135,7 @@ Then offer to scaffold. Do not scaffold unasked.
 
 1. Run `python3 scripts/audit_skills.py <path> --format json` for measured
    facts. Do not eyeball what the script can count.
-2. Run the same five axes and gates against what the skill actually does.
+2. Run the same six axes and gates against what the skill actually does.
 3. Grade: **Justified** · **Thin wrapper** (skill layer earns less than it
    costs) · **Should be deterministic** · **Should be packaged** · **Delete**.
 4. Give specific remediation, with line references.

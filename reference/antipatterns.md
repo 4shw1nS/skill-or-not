@@ -32,6 +32,17 @@ turn afterward pays for it.
 **Fix:** move reference into `reference/*.md`, linked one level deep from
 SKILL.md. Files cost nothing until read.
 
+### The Claude-side fix for a human problem
+A hook, skill, or CLAUDE.md entry aimed at behavior that people, not Claude, are
+producing. It constrains one participant in a workflow that has several, so the
+violations keep arriving from every other direction — a teammate typing by hand,
+a different editor, a paste from the web.
+
+**Spot it:** ask who literally performs the action. If the answer is "engineers",
+no Claude-side mechanism reaches them.
+**Fix:** CI, a linter, a committed pre-commit hook — shared infrastructure that
+catches humans and models with one rule.
+
 ### The suggestion posing as a guardrail
 A skill that says "never commit to main" or "always validate before writing."
 Instructions are advisory; the model may not comply.

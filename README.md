@@ -6,18 +6,20 @@ at all.** Then audit the skills you already have to see whether their shape is
 still right.
 
 ```
-"should this be a skill?"  →  five axes  →  eight gates  →  a verdict with a falsifier
+"should this be a skill?"  →  six axes  →  nine gates  →  a verdict with a falsifier
 ```
 
 The default answer is **no**. The gate order puts the burden of proof on building
 a skill, because the usual failure isn't picking the wrong mechanism — it's
 building something where nothing was needed.
 
-> **Status: v0.1, unverified.** The rubric has been checked against all 22 eval
-> cases with the answer key visible, which validates that the gates yield the
-> labeled shape. It has **not** been measured on blind runs in fresh sessions,
-> so there is no evidence yet about how it behaves on a case it wasn't tuned
-> against. Treat the verdicts as arguments, not measurements.
+> **Status: v0.2, partially verified.** One blind batch has been run: 8 cases in
+> fresh sessions, 6 valid (two were settled by already-installed prior art). Of
+> those 6 the skill fired 7/8 times, got the right shape 6/6, recommended a
+> forbidden shape 0 times, and named the right reason 5/6. That batch produced
+> four fixes, two of which — the **Actor** axis and the **duplicate-trigger**
+> signal — changed the rubric itself, so v0.2 has **not** been re-measured. A
+> fresh batch is pending. Treat the verdicts as arguments, not measurements.
 
 ---
 
@@ -43,7 +45,7 @@ python3 ~/.claude/skills/skill-or-not/scripts/audit_skills.py ~/.claude/skills
 
 ---
 
-## Why five axes instead of a list
+## Why six axes instead of a list
 
 "Skill or plugin?" and "skill or MCP?" are category errors — those live on
 different axes and **compose**. A classifier built on a flat menu of options is
@@ -51,11 +53,17 @@ confidently wrong on exactly the cases that matter.
 
 | Axis | Question |
 |---|---|
+| 👤 **Actor** | Whose behavior must change — Claude's, a human's, or both? |
 | ⚖️ **Judgment** | Is there a decision between the request and the command? |
 | ⏱ **Trigger** | A person, Claude, a file event, a clock, or a push? |
 | 🧠 **Context** | Main thread, isolated subagent, or outside Claude entirely? |
 | 🔌 **Reach** | Local files, or an authenticated external system? |
 | 📦 **Distribution** | One person, a team, or the public? |
+
+**Actor** comes first and eliminates the most. Skills, hooks, CLAUDE.md, and
+permission rules all govern Claude and nobody else — so when the behavior you
+want to change belongs to teammates, no Claude-side mechanism reaches it and the
+answer is CI or a linter.
 
 Shapes on the same axis compete. Shapes on different axes compose. Most correct
 verdicts name two or three.
@@ -68,8 +76,8 @@ verdicts name two or three.
 Build:        <primary shape>
 Plus:         <composition, or "nothing else">
 Don't build:  <the tempting wrong answer, and why>
-Because:      <one named decisive signal>
-Confidence:   High | Medium | Close call
+Because:      <the signal that actually ended the run>
+Confidence:   High | Medium | Close call — split per part when they differ
 Flips if:     <the falsifier>
 ```
 
@@ -106,7 +114,7 @@ third-person descriptions, missing trigger phrases, uncommitted changes, and
 
 ```
 skill-or-not/
-├── SKILL.md                  ← Claude reads this (~130 lines, deliberately)
+├── SKILL.md                  ← Claude reads this (~170 lines, deliberately)
 ├── README.md                 ← this file
 ├── reference/
 │   ├── shapes.md             ← every shape, its real cost, its decisive signal
@@ -117,11 +125,11 @@ skill-or-not/
 ├── scripts/
 │   └── audit_skills.py       ← measurement only; stdlib, no dependencies
 └── evals/
-    ├── cases.jsonl           ← 22 labeled cases
+    ├── cases.jsonl           ← 26 labeled cases
     └── README.md             ← how to grade them
 ```
 
-SKILL.md stays near 130 lines on purpose. A skill body enters the conversation on
+SKILL.md stays near 170 lines on purpose. A skill body enters the conversation on
 invocation and **stays there for the rest of the session** — so length is a
 recurring cost paid on every later turn, including all the turns that have
 nothing to do with it. Everything conditional lives in `reference/`, read only

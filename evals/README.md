@@ -1,6 +1,6 @@
 # Evals
 
-22 labeled cases in `cases.jsonl`. They exist to make changes to the rubric
+26 labeled cases in `cases.jsonl`, 20 of them blind-runnable. They exist to make changes to the rubric
 measurable — if you edit `reference/signals.md`, run these before and after and
 see what moved.
 
@@ -14,7 +14,23 @@ see what moved.
 | `expected_composition` | Shapes that should also appear |
 | `expected_not` | Shapes the verdict must **not** recommend — the tempting wrong answer |
 | `decisive_signal` | Which signal should fire, and in which direction |
+| `blind_runnable` | False when the case is settled by something already installed |
 | `notes` | Why this case is in the set |
+
+### `blind_runnable`
+
+Six cases describe capabilities the author already has installed. On that
+machine Step 0 finds the existing artifact and terminates before the gates run,
+so the case measures prior-art detection rather than the shape decision it was
+written for. They stay in the set because they remain valid **design checks** —
+walk them through the gates on paper — but a blind run of one on a machine that
+has the capability proves nothing.
+
+This was found the hard way: a blind run of `img-merge` returned "you already
+built this", which is correct behavior and a non-result. Check the flag before
+choosing a batch. A case is blind-runnable on *your* machine only if nothing
+installed already solves it — the flag records the author's environment, not
+a universal property.
 
 ## Running them
 
@@ -30,7 +46,7 @@ phrased them as tasks — "Stop Claude from ever running rm -rf on my machine" �
 and in a blind run the skill correctly did not fire. Another skill took it and
 set a deny rule, which was the right outcome.
 
-An imperative is a request to act. Firing a five-axis classifier at one would
+An imperative is a request to act. Firing a six-axis classifier at one would
 wedge a framework between the user and a one-line change. **A case phrased as a
 task tests Claude's default behavior, not this skill** — and if you add one, it
 will look like a trigger failure when it is really a miscategorized case.
@@ -52,12 +68,14 @@ there, so a second case in the same session isn't an independent trial.
 
 - **Ground truth** (5): drawn from skills already built, where the correct
   shape is known from experience rather than argued from the rubric
-- **Adversarial** (7): cases that look like one shape and are another —
+- **Adversarial** (9): cases that look like one shape and are another —
   `prettier-on-save` looks like a skill and is a hook; `internal-wiki-search`
-  looks like knowledge and is a reach problem
+  looks like knowledge and is a reach problem; `untested-endpoints` looks like
+  a Claude problem and is a human one
 - **Null verdicts** (3): cases where the answer is build nothing
-- **Composition** (6): cases where a single-shape verdict is wrong
-- **Close call** (1): `csv-chart`, where the correct behavior is to ask
+- **Composition** (7): cases where a single-shape verdict is wrong
+- **Close call** (2): `support-triage` and `csv-chart`, where the correct
+  behavior is to ask rather than commit
 
 ## The self-reference case
 
