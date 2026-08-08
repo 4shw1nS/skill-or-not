@@ -37,7 +37,7 @@ Any one of these settles it. Do not accumulate counter-arguments.
 | Signal | Verdict |
 |---|---|
 | **The actor is human, not Claude** | CI, linter, process, docs |
-| **An installed skill already claims these triggers** | extend it, don't add a second |
+| **An installed skill already claims these triggers** † | extend it, don't add a second |
 | **Runs unattended** — no human or model present at runtime | script + hook/cron/CI |
 | **Identical invocation every time** | alias |
 | **Needs reproducibility, speed, or bulk** | script |
@@ -45,6 +45,8 @@ Any one of these settles it. Do not accumulate counter-arguments.
 | **Enforcement must be unbypassable** | hook + permissions |
 | **Prior art exists** | build nothing |
 | **The rules are already encoded in a linter/formatter/validator** | run that tool |
+
+† A special case of prior art, not independent of it — see below.
 
 **On the actor signal.** Skills, hooks, CLAUDE.md, and permission rules all
 constrain Claude alone. A teammate who hand-writes the violation, uses a
@@ -55,11 +57,25 @@ pre-commit hook in the repo, a linter everyone runs. Wanting a Claude-side fix
 for a human problem is one of the easiest mistakes to make here, because the
 request arrives while you are already talking to Claude.
 
-**On the duplicate-trigger signal.** Two model-invocable skills matching the
-same phrases both pay permanent system-prompt rent, and which one fires is not
-something you control. Before adding a skill, check what its trigger phrases
-would collide with. Extending the incumbent is almost always cheaper than
-competing with it.
+**On the duplicate-trigger signal.** This is a *refinement of prior art*, not an
+independent signal, and it will almost never be the reason a verdict lands. If
+another skill claims your trigger phrases, that skill **is** prior art, so Step 0
+fires first and settles the case. What duplicate-trigger adds is the specific
+consequence: two model-invocable skills matching the same phrases both pay
+permanent system-prompt rent, and which one fires is not something you control.
+Name it as a supporting reason; expect prior art to be the primary one.
+
+**Testing whether two candidates are really one.** Fill the axis table for the
+proposed sibling and compare it against the incumbent's. If every row matches,
+the difference between them is *what to look for*, not *how the work is shaped*
+— and that is an argument to the existing thing, not a new one.
+
+> Content differences are arguments; mechanism differences are new skills.
+
+A performance reviewer and a security reviewer have identical actors, triggers,
+reach, and distribution. They differ only in which patterns they hunt. That is
+one skill with a focus argument, or a reference file — never two skills fighting
+over "review my PR".
 
 ## Decisive for a skill
 
