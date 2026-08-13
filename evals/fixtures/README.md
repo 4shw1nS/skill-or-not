@@ -17,6 +17,19 @@ To run a Mode B trial, open a fresh session and ask:
 labels here. As with the greenfield cases, the right grade for the wrong
 reason is a fail.
 
+For a **blind** trial, copy the fixture somewhere neutral first and rename
+both the directory and the frontmatter `name` — the names here (`help-mirror`,
+`prior-art-wrapper`) leak their own grades, and a live trial called that out
+unprompted. Run from inside the copy's parent directory so a headless
+session's file sandbox can reach it. Headless sessions also can't approve the
+audit script's Bash prompt; at fixture size a hand count is equivalent, but
+interactive trials exercise the script path too.
+
+First blind trials (2026-08-13, fresh headless sessions, de-identified
+copies): `help-mirror` and `prior-art-wrapper` both fired Mode B unprompted
+and graded to label for the labeled reason. `should-be-script` has not had a
+blind trial yet.
+
 ## `help-mirror/`
 
 **Expected grade: Thin wrapper** — right shape, drifting execution.
@@ -29,6 +42,11 @@ script must report; the `--help` mirror is the judgment half.
 
 **Expected remediation:** point at `--help`; keep only what it can't say
 (the busy-image vs portrait guidance is the one line worth keeping).
+
+**Secondary defect** (unlabeled originally; a blind trial caught it): the
+example commands use paths relative to the skill directory, which break when
+the skill fires from the user's working directory. A full-credit audit
+mentions it; missing it is not a fail.
 
 The `name does not match directory` complaint the script may emit when the
 fixture is copied elsewhere is incidental, not the point of the fixture.
