@@ -88,10 +88,12 @@ know the conventions if it could.
 
 ```
 Build:        MCP server for warehouse access
-Plus:         A skill carrying the conventions — canonical tables, the
-              test-account filter, the metric definitions
-Don't build:  Either one alone. A skill can't grant access; MCP can't know
-              your filtering rules
+Plus:         The conventions in the carrier G3 picks: standing facts with no
+              steps — canonical tables, the test-account filter — go in
+              CLAUDE.md; they move to a skill only once they grow steps
+Don't build:  Either one alone, or a skill by reflex. A skill can't grant
+              access; MCP can't know your filtering rules; and facts without
+              steps don't need a skill to carry them
 Because:      For — authenticated external reach, reusable across many tasks
 Confidence:   High
 Flips if:     Only one query ever matters. Then a script holding the

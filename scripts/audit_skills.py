@@ -32,11 +32,14 @@ RESERVED_NAME_WORDS = ("anthropic", "claude")
 # length past this point is worth flagging well before the hard 500-line cap.
 BODY_ADVISORY_LINES = 200
 
-# Vendored and generated trees. Their scripts are not the skill's interface, and
-# their bundled markdown would otherwise count as "documentation", hiding drift.
+# Vendored, generated, and test-data trees. Their scripts are not the skill's
+# interface, and their bundled markdown would otherwise count as
+# "documentation", hiding drift. `fixtures`/`testdata` also keeps deliberately
+# broken fixture skills out of sweeps — audit one by passing its path directly.
 EXCLUDED_DIRS = frozenset({
     ".venv", "venv", "env", "site-packages", "node_modules",
     ".git", "__pycache__", ".pytest_cache", "build", "dist", ".tox", ".mypy_cache",
+    "fixtures", "testdata",
 })
 
 
@@ -50,6 +53,13 @@ FRONTMATTER_PATTERN = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
 ARGPARSE_FLAG_PATTERN = re.compile(r"""add_argument\(\s*["'](-{1,2}[a-zA-Z][\w-]*)["']""")
 # First-person openings the docs warn break skill discovery.
 FIRST_PERSON_PATTERN = re.compile(r"^\s*(I |I'|You can |You should |We )", re.IGNORECASE)
+# Phrasings that tell Claude *when* a skill applies, not just what it does.
+TRIGGER_HINT_PATTERN = re.compile(
+    r"\buse\s+(this\s+skill\s+|it\s+)?(when|whenever|if|for)\b"
+    r"|\btriggers?\s+(on|with|when)\b"
+    r"|\binvokes?\b",
+    re.IGNORECASE,
+)
 
 
 def parse_frontmatter(text: str) -> tuple[dict[str, str], int]:
@@ -191,7 +201,7 @@ def audit_one(skill_dir: Path) -> dict:
             report["problems"].append(f"description exceeds {DESCRIPTION_MAX_CHARS} chars")
         if FIRST_PERSON_PATTERN.match(description):
             report["problems"].append("description is not third person")
-        if "use when" not in description.lower() and "triggers on" not in description.lower():
+        if not TRIGGER_HINT_PATTERN.search(description):
             report["problems"].append("description states what but not when — hurts discovery")
 
     # Context budget.
@@ -223,10 +233,28 @@ def audit_one(skill_dir: Path) -> dict:
 
 
 def find_skills(path: Path) -> list[Path]:
-    """A skill dir has a SKILL.md; otherwise treat the path as a container."""
+    """A skill dir has a SKILL.md; otherwise recurse into the container.
+
+    Recursion stops at each skill root: a SKILL.md nested inside another skill
+    is that skill's own business (a fixture, a template), not a separate skill.
+    This also finds plugin-style layouts like `repo/skills/<name>/SKILL.md`.
+    """
     if (path / "SKILL.md").is_file():
         return [path]
-    return sorted(child for child in path.iterdir() if (child / "SKILL.md").is_file())
+
+    found: list[Path] = []
+
+    def walk(directory: Path) -> None:
+        for child in sorted(directory.iterdir()):
+            if not child.is_dir() or child.name.startswith(".") or child.name in EXCLUDED_DIRS:
+                continue
+            if (child / "SKILL.md").is_file():
+                found.append(child)
+            else:
+                walk(child)
+
+    walk(path)
+    return found
 
 
 def print_table(reports: list[dict]) -> None:
@@ -265,7 +293,7 @@ def main() -> int:
 
     skills = find_skills(args.path)
     if not skills:
-        print(f"error: no SKILL.md found in {args.path} or its immediate children", file=sys.stderr)
+        print(f"error: no SKILL.md found under {args.path}", file=sys.stderr)
         return 1
 
     reports = [audit_one(s) for s in skills]

@@ -24,6 +24,15 @@ building something where nothing was needed.
 > written by the same author as the rubric. It measures that the gates yield
 > the labeled shape for the labeled reason. It does not measure whether the
 > labels are right.
+>
+> Since v1.2 the fresh sessions and the mechanical half of the grading are
+> automated: `evals/run_evals.py` runs every blind-runnable case in its own
+> headless session, checks the shape and the forbidden shapes, and (with
+> `--judge`) records a second model's read of the stated reason. Judgment
+> still gets the last word — see [`evals/`](evals/). The first full automated
+> run (22 cases, 2026-08-13) finished 21 pass, 1 manual-by-design, 0 rubric
+> defects: all eleven initial auto-fails traced to the harness or to labels
+> the rubric out-argued, and six labels were corrected to match.
 
 ---
 
@@ -131,8 +140,10 @@ skill-or-not/
 ├── scripts/
 │   └── audit_skills.py       ← measurement only; stdlib, no dependencies
 └── evals/
-    ├── cases.jsonl           ← 26 labeled cases
-    └── README.md             ← how to grade them
+    ├── cases.jsonl           ← 29 labeled cases
+    ├── run_evals.py          ← fresh-session runner; auto-grades the mechanical half
+    ├── fixtures/             ← three deliberately flawed skills, graded, for audit mode
+    └── README.md             ← how to run and grade them
 ```
 
 SKILL.md stays near 170 lines on purpose. A skill body enters the conversation on

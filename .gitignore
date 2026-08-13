@@ -4,6 +4,9 @@ __pycache__/
 .pytest_cache/
 .venv/
 
+# Per-run eval transcripts and grades from evals/run_evals.py
+evals/results/
+
 # Session state written by claude-handoff-guard's Stop hook
 HANDOFF.md
 HANDOFF.md.bak

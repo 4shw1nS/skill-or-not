@@ -138,7 +138,9 @@ Then offer to scaffold. Do not scaffold unasked.
 ## Mode B — Audit
 
 1. Run `python3 scripts/audit_skills.py <path> --format json` for measured
-   facts. Do not eyeball what the script can count.
+   facts. The script lives in this skill's own directory — resolve it from
+   where this SKILL.md was loaded, not the working directory. Do not eyeball
+   what the script can count.
 2. Run the same six axes and gates against what the skill actually does.
 3. Grade: **Justified** · **Thin wrapper** (skill layer earns less than it
    costs) · **Should be deterministic** · **Should be packaged** · **Delete**.

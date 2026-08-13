@@ -1,8 +1,9 @@
 # Evals
 
-26 labeled cases in `cases.jsonl`, 20 of them blind-runnable. They exist to make changes to the rubric
-measurable — if you edit `reference/signals.md`, run these before and after and
-see what moved.
+29 labeled cases in `cases.jsonl`, 22 of them blind-runnable, plus three
+[audit-mode fixtures](fixtures/README.md). They exist to make changes to the
+rubric measurable — if you edit `reference/signals.md`, run these before and
+after and see what moved.
 
 ## Case format
 
@@ -19,7 +20,7 @@ see what moved.
 
 ### `blind_runnable`
 
-Six cases describe capabilities the author already has installed. On that
+Seven cases describe capabilities the author already has installed. On that
 machine Step 0 finds the existing artifact and terminates before the gates run,
 so the case measures prior-art detection rather than the shape decision it was
 written for. They stay in the set because they remain valid **design checks** —
@@ -34,9 +35,50 @@ a universal property.
 
 ## Running them
 
-There is no automated runner; grading requires judgment, which is the point.
 Run a case by opening a fresh session and giving it the `input` verbatim, then
-compare the verdict against the labels.
+compare the verdict against the labels. `run_evals.py` automates the fresh
+sessions and the mechanical half of the grading; the judgment half stays with
+you (or, with `--judge`, gets a second model's opinion recorded beside it).
+
+```bash
+python3 run_evals.py --dry-run           # list what would run
+python3 run_evals.py                     # all blind-runnable cases
+python3 run_evals.py --cases resize-800,uuid-gen
+python3 run_evals.py --judge             # also grade the Because: line
+```
+
+Each case gets a fresh `claude -p` session in an empty temp directory, so no
+project context leaks in and no two cases share a session. Per case the runner
+auto-checks three things: the skill **fired**, the `Build:` line matches
+`expected_primary`, and nothing in `expected_not` appears in `Build:`/`Plus:`
+(`Don't build:` may name them — that's its job). Whether the `Because:` line
+matches `decisive_signal` is judgment; the runner prints both side by side,
+or grades it with a second model under `--judge` (`--judge-model`, default
+opus — the judge's false-YES rate is what hides regressions, so don't
+economize here). Transcripts and `results.json` land in `results/<timestamp>`
+(`--outdir` overrides). `--model` picks the model under test,
+`--include-non-blind` adds the cases Step 0 would pre-empt on the author's
+machine, `--claude-bin`, `--claude-arg`, and `--timeout` control the CLI
+invocation itself.
+
+Treat auto-grades as a screen, not a court. `MANUAL` rows and any `FAIL` that
+surprises you deserve a human read of the saved transcript — pattern-matching
+a verdict line is cheaper than judgment, not a replacement for it. The two
+ask-cases (`support-triage`, `csv-chart`) are always `MANUAL`: a single `-p`
+turn can't answer the clarifying question they exist to provoke.
+
+After editing the grader or a case's *labels*, re-grade the saved transcripts
+instead of paying for new sessions: `--regrade results/<timestamp>` (writes
+`results-regraded.json` alongside). A transcript is only reusable while the
+case's `input` is unchanged — a reworded input needs a fresh run.
+
+The first full run of this harness (2026-08-13) is a cautionary tale worth
+keeping: 11 of 23 cases auto-failed, and on inspection *zero* of the eleven
+were rubric defects — four were grader bugs, two were judge false-NOs, one was
+a stale `blind_runnable` flag, three were label defects the rubric outsmarted
+(`pr-triage`'s "each morning" really is a clock; `license-sweep`'s scanner
+work really is a script), and one was the ask-case limitation above. The
+harness's first real product was better labels, not a rubric grade.
 
 ### Why every input is phrased as a design question
 
@@ -93,6 +135,14 @@ there, so a second case in the same session isn't an independent trial.
 - **Composition** (7): cases where a single-shape verdict is wrong
 - **Close call** (2): `support-triage` and `csv-chart`, where the correct
   behavior is to ask rather than commit
+- **Gate coverage** (3): `license-sweep` (G6, the only subagent verdict),
+  `pnpm-not-npm` (G3's always-true branch, the only CLAUDE.md-primary verdict),
+  and `legacy-billing-quirks` (G8's model-only branch, where the invocation
+  setting is part of the pass criteria)
+
+Modes B and C are covered separately: three deliberately flawed fixture skills
+with labeled grades live in [`fixtures/`](fixtures/README.md). Sweeps skip
+them by design; audit one by passing its path directly.
 
 ## The self-reference case
 
