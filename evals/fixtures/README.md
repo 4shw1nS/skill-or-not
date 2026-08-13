@@ -27,8 +27,12 @@ interactive trials exercise the script path too.
 
 First blind trials (2026-08-13, fresh headless sessions, de-identified
 copies): `help-mirror` and `prior-art-wrapper` both fired Mode B unprompted
-and graded to label for the labeled reason. `should-be-script` has not had a
-blind trial yet.
+and graded to label for the labeled reason. A Mode C sweep the same day —
+these three fixtures plus a genuinely justified skill as a control — fired
+unprompted and graded 4/4 to label with the correct ranking, covering
+`should-be-script` and confirming the sweep discriminates rather than
+condemning everything. A good sweep control is a real skill you believe in;
+if the sweep can't tell it from the fixtures, the sweep is worthless.
 
 ## `help-mirror/`
 

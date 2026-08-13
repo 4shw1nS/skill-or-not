@@ -5,5 +5,8 @@
   "author": {
     "name": "Ashwin Sinha"
   },
+  "homepage": "https://github.com/4shw1nS/skill-or-not",
+  "repository": "https://github.com/4shw1nS/skill-or-not",
+  "keywords": ["skills", "audit", "decision-framework", "meta", "architecture", "automation"],
   "license": "MIT"
 }
