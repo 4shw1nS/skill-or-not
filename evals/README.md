@@ -80,6 +80,19 @@ a stale `blind_runnable` flag, three were label defects the rubric outsmarted
 work really is a script), and one was the ask-case limitation above. The
 harness's first real product was better labels, not a rubric grade.
 
+The graded summaries from that run are committed under `evals/results/` so the
+score is checkable without the raw transcripts (which stay local). Read them in
+order: each run's `results.json` is the *first* grading — it still shows the
+pre-correction FAILs described above — and `results-regraded.json` is the final
+grading of the same transcripts under the corrected labels and fixed grader.
+`20260813T171828Z/` holds the full run; its three superseded cases (inputs
+reworded after the trial: `pr-triage`, `bigquery-conventions`, `license-sweep`)
+were re-run fresh in `20260813T174056Z/` and regraded there instead, and
+`commit-summary` is excluded from the regrade because its flip to
+`blind_runnable: false` makes its transcript a documented non-result on the
+author's machine, not a grade. Final tally across both directories:
+21 pass, 1 manual-by-design (`support-triage`), 0 fail.
+
 ### Why every input is phrased as a design question
 
 Each `input` asks *how something should be built*, never *do this thing*. That

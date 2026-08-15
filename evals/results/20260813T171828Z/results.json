@@ -1,0 +1,474 @@
+[
+  {
+    "id": "pr-triage",
+    "fired": true,
+    "verdict": {},
+    "seconds": 48.7,
+    "primary_ok": false,
+    "forbidden_hits": {
+      "cli-script": false
+    },
+    "reason_ok": null,
+    "expected_signal": "for: must gather ambient context (PR age, CI state, who is blocked) before deciding",
+    "because": "",
+    "overall": "FAIL"
+  },
+  {
+    "id": "prettier-on-save",
+    "fired": true,
+    "verdict": {
+      "Build": "PostToolUse hook in settings.json \u2014 matcher on Edit|Write, running `npx prettier --write <edited file>`",
+      "Plus": "nothing else",
+      "Don't build": "a skill \u2014 model-invoked, so it fires only when Claude remembers to; \"every file, every time\" needs the harness to enforce it, and a skill can't",
+      "Because": "G4 \u2014 the trigger is a tool event, which is a hook's domain (and G2's \"no judgment\" confirms no model belongs in the loop)",
+      "Confidence": "High",
+      "Flips if": "you actually wanted conditional formatting (\"format unless it's generated code / decide style per file\") \u2014 judgment would pull a model back in, though even then a hook with a smarter script beats a skill"
+    },
+    "seconds": 25.0,
+    "primary_ok": true,
+    "forbidden_hits": {
+      "skill": false
+    },
+    "reason_ok": true,
+    "expected_signal": "against: trigger is a tool event, and the action is identical every time",
+    "because": "G4 \u2014 the trigger is a tool event, which is a hook's domain (and G2's \"no judgment\" confirms no model belongs in the loop)",
+    "overall": "PASS"
+  },
+  {
+    "id": "heic-convert",
+    "fired": true,
+    "verdict": {
+      "Build": "Nothing \u2014 use sips (built into macOS)",
+      "Plus": "nothing else",
+      "Don't build": "A skill wrapping the conversion. Claude reliably produces the sips one-liner from the bare request; a skill's description would cost context in every session to save nothing.",
+      "Because": "Step 0 \u2014 prior art fully covers the request.",
+      "Confidence": "High",
+      "Flips if": "The real workflow turns out to be bigger than conversion \u2014 e.g. \"watch my Downloads folder and auto-convert\" (that's a hook or launchd job, still not a skill) or a multi-step pipeline with quality/resize/EXIF decisions where judgment actually enters."
+    },
+    "seconds": 27.5,
+    "primary_ok": true,
+    "forbidden_hits": {
+      "skill": false,
+      "cli-script": false
+    },
+    "reason_ok": true,
+    "expected_signal": "against: prior art \u2014 sips and ImageMagick already do this in one line",
+    "because": "Step 0 \u2014 prior art fully covers the request.",
+    "overall": "PASS"
+  },
+  {
+    "id": "daily-standup-slack",
+    "fired": true,
+    "verdict": {
+      "Build": "Scheduled routine (via /schedule) \u2014 cron 0 9 * * *, prompt: \"git log --since=yesterday.midnight --until=midnight, summarize the commits, post to #<channel>\"",
+      "Plus": "Slack access for the routine \u2014 either the Slack MCP connector (currently unauthorized in your setup; connect it via /mcp in an interactive session) or a Slack incoming webhook the routine curls, which is simpler and needs no OAuth.",
+      "Don't build": "A skill. It would just sit there \u2014 you'd still need a scheduler to invoke it every morning, and for one repo the whole procedure fits in the routine's prompt anyway.",
+      "Because": "G4 \u2014 the trigger is a clock, and only a scheduled task fires on a clock.",
+      "Confidence": "High that it's a scheduled task, not a skill. Medium on the unattended-summary part, per the rubric's rule for judgment running without supervision.",
+      "Flips if": "You also want to run it on demand in conversation, or the summary procedure grows rules (multiple repos, formatting conventions, audience-specific tone). Then split it: a thin skill holds the procedure, and the scheduled routine invokes it."
+    },
+    "seconds": 41.4,
+    "primary_ok": true,
+    "forbidden_hits": {
+      "hook": false
+    },
+    "reason_ok": true,
+    "expected_signal": "for: clock trigger, but summarizing commits into prose is judgment",
+    "because": "G4 \u2014 the trigger is a clock, and only a scheduled task fires on a clock.",
+    "overall": "PASS"
+  },
+  {
+    "id": "bigquery-conventions",
+    "fired": true,
+    "verdict": {
+      "Build": "A CLAUDE.md section: which client/connection to use, the canonical table names, and the test-account exclusion predicate (the actual WHERE clause, e.g. `WHERE account_id NOT IN (...)` or `is_test = false`)",
+      "Plus": "Nothing else \u2014 use the existing warehouse CLI for access",
+      "Don't build": "A skill. Two standing facts with no procedure; a skill adds a trigger-when-relevant layer to rules that must apply on every query, which is strictly worse than always-loaded context.",
+      "Because": "G3 \u2014 true on every query, no steps \u2192 CLAUDE.md",
+      "Confidence": "High",
+      "Flips if": "The conventions grow into a real catalog \u2014 dozens of tables, join patterns, metric definitions, a multi-step query workflow. At that point the CLAUDE.md section has become a skill; move it. Or if test-account exclusion becomes unbypassable compliance \u2192 hook."
+    },
+    "seconds": 38.9,
+    "primary_ok": false,
+    "forbidden_hits": {
+      "skill-only": false
+    },
+    "reason_ok": false,
+    "expected_signal": "for: authenticated external reach plus conventions MCP cannot teach \u2014 reach is not knowledge",
+    "because": "G3 \u2014 true on every query, no steps \u2192 CLAUDE.md",
+    "overall": "FAIL"
+  },
+  {
+    "id": "deploy-prod",
+    "fired": true,
+    "verdict": {
+      "Build": "deploy.sh (or a Makefile target) with a `rollback` subcommand \u2014 set -euo pipefail, echo each step",
+      "Plus": "nothing else",
+      "Don't build": "a skill. A skill puts a model between you and a deploy, which adds latency, token cost, and a nonzero chance of deviation to a sequence that must not deviate \u2014 and buys you nothing, since there's no fuzzy intent to interpret",
+      "Because": "G2 \u2014 no judgment anywhere in the sequence; fixed steps belong in deterministic code",
+      "Confidence": "High",
+      "Flips if": "the sequence stops being fixed \u2014 e.g. you want something to interpret health-check output and decide whether to roll back, or choose what to deploy from ambiguous input. Then the judgment part could become a thin skill wrapping the script \u2014 the script still does the deploying"
+    },
+    "seconds": 30.6,
+    "primary_ok": false,
+    "forbidden_hits": {
+      "model-invocable-skill": false
+    },
+    "reason_ok": true,
+    "expected_signal": "against: fragile fixed sequence \u2014 low degrees of freedom",
+    "because": "G2 \u2014 no judgment anywhere in the sequence; fixed steps belong in deterministic code",
+    "overall": "FAIL"
+  },
+  {
+    "id": "block-rm-rf",
+    "fired": true,
+    "verdict": {
+      "Build": "Permission deny rules + a PreToolUse hook in settings.json",
+      "Plus": "Nothing else (optionally a one-line CLAUDE.md note so Claude knows the rule exists and doesn't waste turns trying)",
+      "Don't build": "A skill. Skills are model-read instructions \u2014 exactly the layer a \"never\" requirement can't trust. Worst case, it's a suggestion; it's never a lock.",
+      "Because": "G1 (enforcement) \u2014 bypass must be impossible, so the harness, not the model, must own the block.",
+      "Confidence": "High",
+      "Flips if": "You actually only want a reminder/nudge, not a guarantee \u2014 then a CLAUDE.md line suffices and no skill is needed either."
+    },
+    "seconds": 33.5,
+    "primary_ok": true,
+    "forbidden_hits": {
+      "skill": false
+    },
+    "reason_ok": true,
+    "expected_signal": "against: enforcement must be unbypassable, so it cannot depend on model compliance",
+    "because": "G1 (enforcement) \u2014 bypass must be impossible, so the harness, not the model, must own the block.",
+    "overall": "PASS"
+  },
+  {
+    "id": "pr-checklist",
+    "fired": true,
+    "verdict": {
+      "Build": "Repo-checked-in skill (.claude/skills/code-review-checklist/) holding the checklist, applied whenever Claude reviews code",
+      "Plus": "A PR-template checkbox list if human reviewers are the ones forgetting \u2014 that half is unreachable by any Claude mechanism",
+      "Don't build": "A CLAUDE.md section \u2014 pays context cost on every turn for something used only during reviews, and checklists with steps are skills by definition",
+      "Because": "G3 \u2014 invoked sometimes and procedural, not always-true facts",
+      "Confidence": "High on skill vs CLAUDE.md; Medium on the PR-template half (depends on who actually does the forgetting)",
+      "Flips if": "The \"checklist\" is really 3\u20135 one-line standing conventions (\"we use X, never Y\") \u2014 those are facts, not procedure, and CLAUDE.md carries them fine"
+    },
+    "seconds": 44.4,
+    "primary_ok": true,
+    "forbidden_hits": {
+      "claude-md": false
+    },
+    "reason_ok": true,
+    "expected_signal": "for: a procedure, not a fact \u2014 and it applies conditionally, not always",
+    "because": "G3 \u2014 invoked sometimes and procedural, not always-true facts",
+    "overall": "PASS"
+  },
+  {
+    "id": "uuid-gen",
+    "fired": true,
+    "verdict": {
+      "Build": "Nothing",
+      "Plus": "Nothing else",
+      "Don't build": "A skill. Its description would sit in your system prompt every session to save re-deriving a one-line command Claude already knows cold. It costs context permanently and earns nothing.",
+      "Because": "Step 0 \u2014 prior art (uuidgen) covers the entire request.",
+      "Confidence": "High",
+      "Flips if": "Your actual need is bigger than stated \u2014 e.g. \"generate UUIDs in our project's specific format, register them in a service, and update three files\" \u2014 then there's a procedure worth capturing, and a skill (or script) becomes worth discussing."
+    },
+    "seconds": 19.3,
+    "primary_ok": true,
+    "forbidden_hits": {
+      "skill": false,
+      "cli-script": false
+    },
+    "reason_ok": true,
+    "expected_signal": "against: prior art, and no repetition",
+    "because": "Step 0 \u2014 prior art (uuidgen) covers the entire request.",
+    "overall": "PASS"
+  },
+  {
+    "id": "resize-800",
+    "fired": true,
+    "verdict": {
+      "Build": "a shell function in ~/.zshrc r800() { sips --resampleWidth 800 \"$@\"; }",
+      "Plus": "nothing else",
+      "Don't build": "a skill \u2014 it adds a model invocation, latency, and permanent context cost to a zero-judgment command",
+      "Because": "Step 0 \u2014 sips already does this; G2 confirms no judgment exists",
+      "Confidence": "High",
+      "Flips if": "the workflow grows decisions \u2014 e.g. \"resize whatever images I just downloaded, convert HEIC to JPG, skip ones already under 800px, name them for the blog\" \u2014 at which point a script with a thin skill wrapper becomes the right shape"
+    },
+    "seconds": 27.3,
+    "primary_ok": true,
+    "forbidden_hits": {
+      "skill": false
+    },
+    "reason_ok": true,
+    "expected_signal": "against: prior art (sips/ImageMagick) or identical invocation \u2014 the readings converge on a shell function, and both forbid a skill",
+    "because": "Step 0 \u2014 sips already does this; G2 confirms no judgment exists",
+    "overall": "PASS"
+  },
+  {
+    "id": "onboarding-conventions",
+    "fired": true,
+    "verdict": {
+      "Build": "Lint/format rules in a shared config package, enforced in CI across all repos (blocking on PRs)",
+      "Plus": "A short conventions section in each repo's CLAUDE.md (or one shared file imported by each) for the judgment-y rules a linter can't express \u2014 and it stays short, since it costs context every turn",
+      "Don't build": "A skill. It misses the human half entirely (G0) and misfires on the Claude half (G3: standing facts, no procedure, needed every turn \u2014 that's CLAUDE.md territory)",
+      "Because": "G0 \u2014 the actor includes humans, and only CI reaches them",
+      "Confidence": "High on CI + shared lint config; Medium on how much belongs in CLAUDE.md vs. just letting CI catch it",
+      "Flips if": "The violations turn out to be procedural, not stylistic \u2014 e.g. \"how to add a new endpoint in our stack\" with real steps, invoked occasionally. That part would be a genuine skill, distributed as a plugin across the repos (G7)."
+    },
+    "seconds": 44.3,
+    "primary_ok": true,
+    "forbidden_hits": {
+      "skill": false
+    },
+    "reason_ok": false,
+    "expected_signal": "against: the actor is both humans and Claude, so no Claude-side mechanism is load-bearing",
+    "because": "G0 \u2014 the actor includes humans, and only CI reaches them",
+    "overall": "FAIL"
+  },
+  {
+    "id": "ci-test-suite",
+    "fired": true,
+    "verdict": {
+      "Build": "A CI workflow \u2014 e.g. .github/workflows/test.yml with `on: push: branches: [main]` running your test command (GitLab CI / Buildkite equivalent if you're not on GitHub)",
+      "Plus": "Nothing else. Optionally the same workflow on pull_request so failures surface before they reach main.",
+      "Don't build": "A Claude hook or scheduled task. A hook only fires inside a Claude session, so any push made outside one is silently untested. A scheduled task polls a clock, not pushes.",
+      "Because": "G0/G4 \u2014 the actor isn't Claude and the trigger is a push; both route straight to CI.",
+      "Confidence": "High",
+      "Flips if": "What you actually meant was \"when *Claude* pushes during a session, run tests first\" \u2014 that's a Claude-side concern and a PreToolUse hook on `git push` becomes the answer."
+    },
+    "seconds": 25.3,
+    "primary_ok": true,
+    "forbidden_hits": {
+      "skill": false,
+      "hook": false
+    },
+    "reason_ok": true,
+    "expected_signal": "against: unattended, must be reproducible and auditable, no model in the loop",
+    "because": "G0/G4 \u2014 the actor isn't Claude and the trigger is a push; both route straight to CI.",
+    "overall": "PASS"
+  },
+  {
+    "id": "commit-summary",
+    "fired": true,
+    "verdict": {
+      "Build": "Nothing. Invoke /engineering:standup with \"cover the last week, audience is my manager\" \u2014 or just ask inline.",
+      "Plus": "Nothing else.",
+      "Don't build": "A script \u2014 the deterministic core is one git log invocation; a script would wrap it with zero added value. Also don't build a new skill that duplicates standup.",
+      "Because": "Step 0 \u2014 prior art (engineering:standup + git log) covers the entire request.",
+      "Confidence": "High",
+      "Flips if": "This becomes a standing weekly ritual with a fixed, team-specific format standup can't express \u2014 then a thin personal skill (or a /schedule'd Friday run) earns its keep."
+    },
+    "seconds": 28.8,
+    "primary_ok": false,
+    "forbidden_hits": {
+      "cli-script": false
+    },
+    "reason_ok": false,
+    "expected_signal": "for: turning a diff into an audience-appropriate narrative is irreducibly judgment",
+    "because": "Step 0 \u2014 prior art (engineering:standup + git log) covers the entire request.",
+    "overall": "FAIL"
+  },
+  {
+    "id": "markdown-lint",
+    "fired": true,
+    "verdict": {
+      "Build": "Nothing new. Prettier config + pre-commit hook + CI check.",
+      "Plus": "Optionally a Claude Code PostToolUse hook that runs prettier on .md files Claude edits \u2014 nice-to-have, since the pre-commit hook already catches Claude's commits.",
+      "Don't build": "A skill or CLAUDE.md rule telling Claude to format markdown nicely. It's advisory, it only governs Claude, and it re-does deterministic work a formatter does better.",
+      "Because": "Step 0 (prior art) + G0 (the actor is everyone, not Claude) \u2014 only CI/tooling reaches all editors.",
+      "Confidence": "High",
+      "Flips if": "\"Consistently formatted\" turns out to mean editorial consistency \u2014 tone, structure, terminology \u2014 which a formatter can't judge. Then a skill enters the picture."
+    },
+    "seconds": 33.6,
+    "primary_ok": false,
+    "forbidden_hits": {
+      "skill": false
+    },
+    "reason_ok": true,
+    "expected_signal": "against: a linter already encodes the rules deterministically",
+    "because": "Step 0 (prior art) + G0 (the actor is everyone, not Claude) \u2014 only CI/tooling reaches all editors.",
+    "overall": "FAIL"
+  },
+  {
+    "id": "internal-wiki-search",
+    "fired": true,
+    "verdict": {
+      "Build": "Nothing \u2014 authorize the existing Atlassian MCP server (/mcp in an interactive session)",
+      "Plus": "2\u20133 lines in CLAUDE.md: when to search Confluence, which spaces matter, and any org quirks (e.g. \"the ENG space is stale; trust PLATFORM\")",
+      "Don't build": "A \"search-confluence\" skill \u2014 it would be a thin wrapper around MCP tools Claude can already call, with a trigger (\"answering questions\") too broad to match reliably",
+      "Because": "Step 0 (access already exists as MCP) + G3 (the remaining knowledge is a standing fact with no steps \u2192 CLAUDE.md)",
+      "Confidence": "High",
+      "Flips if": "The guidance grows real procedure \u2014 CQL query recipes, a multi-space triage order, \"check Confluence then Jira then ask in Slack\" workflows. Steps that are invoked sometimes, not always, belong in a skill; move it then."
+    },
+    "seconds": 30.0,
+    "primary_ok": true,
+    "forbidden_hits": {
+      "skill": false
+    },
+    "reason_ok": true,
+    "expected_signal": "for: authenticated external reach, no procedure to teach",
+    "because": "Step 0 (access already exists as MCP) + G3 (the remaining knowledge is a standing fact with no steps \u2192 CLAUDE.md)",
+    "overall": "PASS"
+  },
+  {
+    "id": "shared-review-standards",
+    "fired": true,
+    "verdict": {
+      "Build": "One team plugin, distributed via a private marketplace repo",
+      "Plus": "Inside it: (1) a review-standards skill (judgment + steps), (2) hooks.json for the tool-event hooks + permission rules for anything that must be unbypassable, (3) helper scripts/binaries referenced via ${CLAUDE_PLUGIN_ROOT} so hooks and skills find them without PATH setup. Team members add the marketplace once; or pin it in each repo's .claude/settings.json extraKnownMarketplaces so it's offered automatically on trust.",
+      "Don't build": "Copying .claude/ directories into all eight repos (drifts immediately, and updating standards means eight PRs), or git submodules for the same reason. Also don't stuff the standards into eight CLAUDE.md files \u2014 they have steps; that's a skill.",
+      "Because": "G7 \u2014 the distribution axis (one team, eight repos) is what settles packaging; the mechanisms themselves were already decided by G2\u2013G4.",
+      "Confidence": "High on plugin-as-package. Medium on binaries: if they're real compiled per-platform binaries humans also run outside Claude, ship them as a normal CLI package (homebrew tap / npm) and have the plugin depend on them rather than vendoring.",
+      "Flips if": "The review standards must constrain human-authored PRs too \u2014 then the enforcement half moves to CI (G0), and the plugin keeps only Claude's copy of the judgment."
+    },
+    "seconds": 45.1,
+    "primary_ok": true,
+    "forbidden_hits": {
+      "skill-only": false
+    },
+    "reason_ok": true,
+    "expected_signal": "for: multi-repo distribution with versioning is exactly what packaging solves",
+    "because": "G7 \u2014 the distribution axis (one team, eight repos) is what settles packaging; the mechanisms themselves were already decided by G2\u2013G4.",
+    "overall": "PASS"
+  },
+  {
+    "id": "archive-projects",
+    "fired": true,
+    "verdict": {},
+    "seconds": 31.8,
+    "primary_ok": false,
+    "forbidden_hits": {
+      "fat-skill": false
+    },
+    "reason_ok": null,
+    "expected_signal": "against: no decision sits between the request and the command; the sequence is identical every time",
+    "because": "",
+    "overall": "FAIL"
+  },
+  {
+    "id": "support-triage",
+    "fired": true,
+    "verdict": {
+      "Build": "A skill carrying the triage rubric \u2014 your categories, priority definitions, routing map, escalation rules. This is judgment knowledge invoked sometimes with steps (G3), the exact skill shape.",
+      "Plus": "(1) Reach: an MCP server for your helpdesk if one exists (Zendesk, Intercom, and Linear all have them), else a small script holding the API credential. The skill teaches; it cannot connect (G5). (2) Trigger: if this should run unattended on incoming tickets, a scheduled task (/schedule) invoking the skill. Mis-triage is recoverable \u2014 a human re-routes \u2014 so an unattended model run is legitimate here, not reckless (G4).",
+      "Don't build": "A skill alone. It would only work when you remember to invoke it in a session, which defeats \"incoming.\"",
+      "Because": "G5 \u2014 triage requires authenticated reach into the helpdesk, which no amount of skill-writing provides; the skill earns its place only as the knowledge carrier beside that access.",
+      "Confidence": "High on the composition (skill + access mechanism); Medium on the scheduled trigger \u2014 if you actually just want \"/triage my queue\" on demand, drop the schedule and keep the skill user-invocable.",
+      "Flips if": "Your routing rules turn out to be deterministic (keyword \u2192 queue). Then there's no judgment (G2 fails), and this is a helpdesk automation rule or a script \u2014 no model, no skill."
+    },
+    "seconds": 42.6,
+    "primary_ok": null,
+    "hedge_detected": false,
+    "forbidden_hits": {},
+    "reason_ok": false,
+    "expected_signal": "ambiguous: keyword routing is a script, reading urgency and sentiment is a skill, and the request does not say which",
+    "because": "G5 \u2014 triage requires authenticated reach into the helpdesk, which no amount of skill-writing provides; the skill earns its place only as the knowledge carrier beside that access.",
+    "overall": "FAIL"
+  },
+  {
+    "id": "untested-endpoints",
+    "fired": true,
+    "verdict": {
+      "Build": "Nothing custom \u2014 a CI check. Either patch-coverage enforcement (Codecov patch status / diff-cover with a threshold) or a simple PR rule: \"changed files under routes/ or api/ \u21d2 require changed files under tests/\".",
+      "Plus": "Nothing else. If you want a softer on-ramp, start the check as non-blocking (warning comment) for two weeks, then make it required.",
+      "Don't build": "A skill. It only changes Claude's behavior, and Claude isn't writing these endpoints. It would be a reminder posted where the forgetful party never looks.",
+      "Because": "G0 \u2014 the actor whose behavior must change is human, so no Claude-side mechanism (skill, hook, CLAUDE.md) can reach it. Step 0 also independently ends it: diff-coverage gates already exist.",
+      "Confidence": "High",
+      "Flips if": "Your team starts writing endpoints with Claude's help \u2014 then a small skill or CLAUDE.md line (\"new endpoints ship with tests\") becomes worthwhile *alongside* the CI check, never instead of it."
+    },
+    "seconds": 24.4,
+    "primary_ok": true,
+    "forbidden_hits": {
+      "skill": false,
+      "hook": false
+    },
+    "reason_ok": true,
+    "expected_signal": "against: the actor is human \u2014 no Claude-side mechanism reaches a teammate who writes code without Claude",
+    "because": "G0 \u2014 the actor whose behavior must change is human, so no Claude-side mechanism (skill, hook, CLAUDE.md) can reach it. Step 0 also independently ends it: diff-coverage gates already exist.",
+    "overall": "PASS"
+  },
+  {
+    "id": "duplicate-pr-review",
+    "fired": true,
+    "verdict": {
+      "Build": "nothing new for the generic case \u2014 engineering:code-review and /code-review already do performance. If you have team-specific perf conventions worth encoding, add them to your existing review skill as a section or reference/performance.md, and rename it (e.g. pr-review) if \"security\" no longer fits.",
+      "Plus": "nothing else.",
+      "Don't build": "a parallel performance-review skill. It duplicates the trigger and procedure, adds a second always-loaded description to your system prompt, and makes every PR need two invocations (or makes Claude guess which one you meant).",
+      "Because": "Step 0 \u2014 prior art covers generic performance review; and the residual (your custom checklist) shares trigger and workflow with the existing skill, so it's a section, not a sibling.",
+      "Confidence": "High on \"not a separate skill\"; Medium on extend-vs-just-use- the-plugin \u2014 that depends on whether you actually have house-specific performance rules the generic reviewers miss.",
+      "Flips if": "your \"performance review\" turns out to be a different workflow than reading a diff \u2014 e.g. running benchmarks, profiling a deployed service, or load testing. That's a distinct procedure with distinct steps and would legitimately be its own skill."
+    },
+    "seconds": 65.4,
+    "primary_ok": true,
+    "forbidden_hits": {
+      "skill": true
+    },
+    "reason_ok": true,
+    "expected_signal": "against: prior art, refined by duplicate trigger \u2014 an incumbent skill claiming the same phrases IS prior art, so Step 0 leads and trigger collision is the supporting reason",
+    "because": "Step 0 \u2014 prior art covers generic performance review; and the residual (your custom checklist) shares trigger and workflow with the existing skill, so it's a section, not a sibling.",
+    "overall": "FAIL"
+  },
+  {
+    "id": "license-sweep",
+    "fired": true,
+    "verdict": {
+      "Build": "A script. One shell/Python script that loops over the ~40 repos, runs the right scanner per ecosystem (osv-scanner for dependency vulns works across lockfile types; license-checker / pip-licenses / cargo-deny or trivy for licenses), writes each repo's full output to a file under e.g. scan-results/<repo>.json, and prints ONLY the aggregate summary table to stdout.",
+      "Plus": "Claude in the main thread reviews the compact table afterward \u2014 that's where the only real judgment lives (is GPL-3.0 in repo X actually a problem for you?). Nothing else.",
+      "Don't build": "40 fan-out subagents each \"scanning a repo.\" The flood isn't solved by isolation \u2014 it's solved by the scanner output going to files instead of context. Subagents here are 40 cold starts paying model prices to run a for-loop. Also don't build a skill yet: invoked once, a skill's permanent context cost buys nothing.",
+      "Because": "G2 \u2014 there is no decision between \"scan this repo\" and the command that scans it; deterministic code owns the work, and once a script owns it, the context-flood concern (G6) dissolves as a side effect, because the script controls what reaches stdout.",
+      "Confidence": "High on the script. Medium on \"no skill\" \u2014 see falsifier.",
+      "Flips if": "This becomes recurring (\"re-check monthly,\" \"run before each release\"). Then wrap the same script in a thin user-invocable skill (or a scheduled task if a clock should trigger it), where the skill's only job is running the script and interpreting the table. The script stays the core either way."
+    },
+    "seconds": 53.8,
+    "primary_ok": false,
+    "forbidden_hits": {
+      "claude-md": false
+    },
+    "reason_ok": false,
+    "expected_signal": "for: parallel fan-out whose transcripts would flood the main thread \u2014 isolation and parallelism, not brainpower",
+    "because": "G2 \u2014 there is no decision between \"scan this repo\" and the command that scans it; deterministic code owns the work, and once a script owns it, the context-flood concern (G6) dissolves as a side effect, because the script controls what reaches stdout.",
+    "overall": "FAIL"
+  },
+  {
+    "id": "pnpm-not-npm",
+    "fired": true,
+    "verdict": {
+      "Build": "CLAUDE.md section in the repo root (committed)",
+      "Plus": "nothing else",
+      "Don't build": "A skill \u2014 it loads conditionally, but these facts must hold unconditionally on every turn; a skill can be skipped exactly when it matters most.",
+      "Because": "G3 \u2014 always-true facts with no steps belong in CLAUDE.md.",
+      "Confidence": "High",
+      "Flips if": "The section grows procedures (\"to add a package: \u2026\", \"release steps: \u2026\") \u2014 steps invoked sometimes are a skill, and should move out at that point. Or if you later do want npm blocked, that part becomes a hook."
+    },
+    "seconds": 29.8,
+    "primary_ok": true,
+    "forbidden_hits": {
+      "skill": false
+    },
+    "reason_ok": true,
+    "expected_signal": "for: standing facts true on every turn with no procedure \u2014 G3's always-true branch",
+    "because": "G3 \u2014 always-true facts with no steps belong in CLAUDE.md.",
+    "overall": "PASS"
+  },
+  {
+    "id": "legacy-billing-quirks",
+    "fired": true,
+    "verdict": {
+      "Build": "Model-invocable skill, `user-invocable: false`, e.g. .claude/skills/billing-safety/SKILL.md",
+      "Plus": "Nothing else \u2014 but write the description as the trigger: name the actual paths, table names, and terms (\"billing/\", \"invoices table\", \"soft delete\", \"charge dates\") so Claude's relevance match fires. The description is the whole mechanism.",
+      "Don't build": "A CLAUDE.md section (per-turn context tax for sometimes-needed, step-laden knowledge) or a user-invocable command (you stated you'd never call it).",
+      "Because": "G3 \u2014 sometimes-relevant + multi-step \u2192 skill; G8 sets the invocation flags.",
+      "Confidence": "High on the shape; Medium on trigger reliability.",
+      "Flips if": "Claude keeps missing it on billing edits \u2014 then add a PreToolUse hook matched on billing file paths that injects \"read the billing-safety skill first,\" making the trigger deterministic while the knowledge stays in the skill."
+    },
+    "seconds": 37.3,
+    "primary_ok": true,
+    "forbidden_hits": {
+      "claude-md": false
+    },
+    "reason_ok": false,
+    "expected_signal": "for: a conditional multi-step procedure \u2014 G3 routes it to a skill, and G8 marks it user-invocable: false because it is knowledge, not an action",
+    "because": "G3 \u2014 sometimes-relevant + multi-step \u2192 skill; G8 sets the invocation flags.",
+    "overall": "FAIL"
+  }
+]

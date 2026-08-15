@@ -1,0 +1,65 @@
+[
+  {
+    "id": "pr-triage",
+    "fired": true,
+    "verdict": {
+      "Build": "User-invocable skill: fetch PRs via gh (list + review-requested, with age, diff size, CI status, draft state), then rank using your stated priorities and explain each placement in one line.",
+      "Plus": "Nothing else. No MCP, no script, no schedule.",
+      "Don't build": "A deterministic scoring script (a fixed formula can't see \"this blocks the release\" and needs endless tuning), or a GitHub MCP server (gh already gives Claude authenticated reach).",
+      "Because": "G3/G4 \u2014 a stepped procedure invoked on demand by a person, with real judgment in the middle, is the textbook skill case.",
+      "Confidence": "High",
+      "Flips if": "Your ranking turns out to be a fixed rule (\"oldest first\") \u2014 then it's a gh alias and the skill is a thin wrapper to delete. Or you want it pushed to you at 9am instead of asked for \u2014 then compose in a scheduled task that runs the same skill."
+    },
+    "seconds": 42.7,
+    "primary_ok": true,
+    "forbidden_hits": {
+      "cli-script": false
+    },
+    "reason_ok": true,
+    "expected_signal": "for: judgment over ambient context (PR age, CI state, who is blocked) \u2014 equivalently G2/G3, a sometimes-invoked stepped procedure with judgment in the middle",
+    "because": "G3/G4 \u2014 a stepped procedure invoked on demand by a person, with real judgment in the middle, is the textbook skill case.",
+    "overall": "PASS"
+  },
+  {
+    "id": "bigquery-conventions",
+    "fired": true,
+    "verdict": {
+      "Build": "MCP server or vendor CLI for warehouse access",
+      "Plus": "A CLAUDE.md section: canonical table names + the exact test-account exclusion predicate",
+      "Don't build": "A skill \u2014 it would carry two facts with no procedure, and its conditional loading makes it *less* reliable than CLAUDE.md here",
+      "Because": "G5 settled access (reach needs a connector, not knowledge); G3 settled the rules (standing facts, no steps \u2192 CLAUDE.md)",
+      "Confidence": "High on CLAUDE.md for the rules; Medium on MCP vs CLI \u2014 depends on which warehouse you're on",
+      "Flips if": "The rules grow into a procedure \u2014 metric definitions, join maps, a \"how to answer revenue questions\" playbook. At that point the CLAUDE.md section has become a skill and should move."
+    },
+    "seconds": 40.6,
+    "primary_ok": true,
+    "forbidden_hits": {
+      "skill-only": false
+    },
+    "reason_ok": true,
+    "expected_signal": "for: authenticated external reach (G5) \u2014 reach is not knowledge, so MCP grants access while G3 routes the conventions to their own carrier",
+    "because": "G5 settled access (reach needs a connector, not knowledge); G3 settled the rules (standing facts, no steps \u2192 CLAUDE.md)",
+    "overall": "PASS"
+  },
+  {
+    "id": "license-sweep",
+    "fired": true,
+    "verdict": {
+      "Build": "One rubric prompt, reused verbatim across 40 subagent launches (batched ~6\u20138 concurrent, not all at once). Each subagent reviews exactly one repo and must end by **writing one structured row to a file** in a shared results directory \u2014 e.g. a small JSON with fixed keys: `repo, declared_license, header_findings, vendored_mismatches, readme_license_conflict, severity, confidence, one_line_note`. The main session (or a 10-line script) then assembles the table deterministically from those 40 small files.",
+      "Plus": "the scanner pre-pass per repo, fed into each subagent's prompt as anchoring evidence. And write the rubric down *before* launching anything \u2014 the failure mode of this shape is 40 agents each inventing their own severity scale, which makes the combined table meaningless.",
+      "Don't build": "a skill or MCP server. This is (as stated) a one-time audit; a skill's job is packaging a *recurring* procedure. Also don't rely on the agents' final chat reports as the aggregation channel \u2014 reports are freeform prose and you'd be back to parsing 40 transcripts. The file contract is what makes the summary table mechanical.",
+      "Because": "G6 \u2014 the output volume and need for isolation is what dictates the shape; G2 (real judgment per repo) is what keeps a model inside each unit instead of a pure script.",
+      "Confidence": "High on the fan-out + file contract. Close call on the scanner pre-pass \u2014 if the repos are small, raw reading may be enough.",
+      "Flips if": "this becomes a quarterly compliance sweep \u2014 then the rubric + fan-out procedure *is* worth wrapping as a user-invocable skill (`disable-model-invocation: true`, since you'd want to control when 40 agents launch), and the results dir becomes an append-only history."
+    },
+    "seconds": 42.9,
+    "primary_ok": true,
+    "forbidden_hits": {
+      "claude-md": false
+    },
+    "reason_ok": true,
+    "expected_signal": "for: parallel fan-out whose transcripts would flood the main thread \u2014 isolation and parallelism, not brainpower",
+    "because": "G6 \u2014 the output volume and need for isolation is what dictates the shape; G2 (real judgment per repo) is what keeps a model inside each unit instead of a pure script.",
+    "overall": "PASS"
+  }
+]

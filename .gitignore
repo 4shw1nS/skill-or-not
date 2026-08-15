@@ -4,8 +4,14 @@ __pycache__/
 .pytest_cache/
 .venv/
 
-# Per-run eval transcripts and grades from evals/run_evals.py
-evals/results/
+# Per-run eval transcripts from evals/run_evals.py stay local;
+# the graded summaries (results*.json) are committed so the README's
+# score claims are verifiable without the raw transcripts.
+evals/results/*
+!evals/results/*/
+evals/results/*/*
+!evals/results/*/results.json
+!evals/results/*/results-regraded.json
 
 # Session state written by claude-handoff-guard's Stop hook
 HANDOFF.md
