@@ -1,0 +1,27 @@
+{
+  "name": "skill-or-not",
+  "owner": {
+    "name": "Ashwin Sinha",
+    "url": "https://github.com/4shw1nS"
+  },
+  "metadata": {
+    "description": "Marketplace for the skill-or-not plugin: decide what shape a workflow deserves, and audit the skills you already have.",
+    "version": "1.2.0"
+  },
+  "plugins": [
+    {
+      "name": "skill-or-not",
+      "source": "./",
+      "description": "Decides whether a problem, workflow, or intent should become a skill, a script, a CLI, a hook, a subagent, an MCP server, a scheduled job, a plugin, or nothing at all — and audits existing skills for whether their shape is still right.",
+      "version": "1.2.0",
+      "author": {
+        "name": "Ashwin Sinha"
+      },
+      "homepage": "https://github.com/4shw1nS/skill-or-not",
+      "repository": "https://github.com/4shw1nS/skill-or-not",
+      "license": "MIT",
+      "keywords": ["skills", "audit", "decision-framework", "meta", "architecture", "automation"],
+      "category": "productivity"
+    }
+  ]
+}

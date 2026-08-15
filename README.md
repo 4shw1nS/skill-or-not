@@ -38,6 +38,15 @@ building something where nothing was needed.
 
 ## Try it in 30 seconds
 
+As a plugin (the repo is its own marketplace):
+
+```
+/plugin marketplace add 4shw1nS/skill-or-not
+/plugin install skill-or-not@skill-or-not
+```
+
+Or as a plain personal skill:
+
 ```bash
 git clone https://github.com/4shw1nS/skill-or-not.git
 cp -R skill-or-not ~/.claude/skills/
